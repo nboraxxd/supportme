@@ -16,7 +16,7 @@
   },
   "settings": {
     "tailwindcss": {
-      "callees": ["cn", "className"],
+      "callees": ["cn", "className", "cva"],
       "classRegex": ".*[Cc]lass[Nn]ame.*"
     }
   }
