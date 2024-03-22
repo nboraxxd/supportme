@@ -6,11 +6,11 @@ import Link from 'next/link'
 export default function Home() {
   return (
     <>
-      <h1 className="flex items-center gap-2">
+      <h1 className="flex items-center justify-center gap-2 max-sm:flex-col">
         <PersonStandingIcon size={50} className="text-pink-500" />
         SupportMe
       </h1>
-      <p>The best dashboard to manage customer support</p>
+      <p className="text-balance text-center">The best dashboard to manage customer support</p>
       <div className="flex items-center gap-2">
         <Button asChild>
           <Link href="/login">Log in</Link>
