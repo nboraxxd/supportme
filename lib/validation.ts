@@ -17,7 +17,7 @@ export const signUpFormSchema = z
       .object({
         type: z.enum(['personal', 'company']),
         company: z.string().optional(),
-        numberOfEmployees: z.number().optional(),
+        numberOfEmployees: z.coerce.number().optional(),
       })
       .superRefine(({ type, company }, ctx) => {
         if (type === 'company' && !company) {
@@ -32,12 +32,16 @@ export const signUpFormSchema = z
         if (type === 'company' && (!numberOfEmployees || numberOfEmployees < 1)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'Number of employees is required',
+            message: 'Number of employess must be greater than 0',
             path: ['numberOfEmployees'],
           })
         }
       }),
-    dob: z.date(),
+    dob: z.date().refine((date) => {
+      const today = new Date()
+      const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate())
+      return date <= eighteenYearsAgo
+    }, 'You must be at least 18 years old'),
     password,
     confirmPassword: password,
   })

@@ -23,7 +23,7 @@ export default function LoginForm() {
       confirmPassword: '',
       account: {
         type: 'personal',
-        company: '',
+        company: undefined,
         numberOfEmployees: undefined,
       },
       dob: undefined,
@@ -38,7 +38,7 @@ export default function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" noValidate>
+      <form onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))} className="space-y-6" noValidate>
         {/* Email */}
         <FormField
           control={form.control}
@@ -61,14 +61,24 @@ export default function LoginForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Account type</FormLabel>
-              <Select onValueChange={field.onChange}>
+              <Select
+                onValueChange={(value: SignUpFormValues['account']['type']) => {
+                  if (value === 'personal') {
+                    form.setValue('account.company', undefined)
+                    form.setValue('account.numberOfEmployees', undefined)
+                  }
+
+                  return field.onChange(value)
+                }}
+                defaultValue={field.value}
+              >
                 <FormControl>
                   <SelectTrigger
                     className={cn({
                       'text-muted-foreground': accountType === undefined,
                     })}
                   >
-                    <SelectValue placeholder="Select an account type" defaultValue={field.value} />
+                    <SelectValue placeholder="Select an account type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -81,7 +91,7 @@ export default function LoginForm() {
           )}
         />
 
-        {accountType === 'company' && (
+        {accountType === 'company' ? (
           <>
             {/* Company name */}
             <FormField
@@ -91,7 +101,7 @@ export default function LoginForm() {
                 <FormItem>
                   <FormLabel>Company name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Wayne Enterprises" {...field} />
+                    <Input placeholder="Wayne Enterprises" {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,14 +115,14 @@ export default function LoginForm() {
                 <FormItem>
                   <FormLabel>Employee count</FormLabel>
                   <FormControl>
-                    <Input placeholder="150" type="number" {...field} />
+                    <Input placeholder="150" type="number" {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </>
-        )}
+        ) : null}
 
         {/* Date of birth */}
         <FormField
@@ -128,7 +138,7 @@ export default function LoginForm() {
                       variant={'outline'}
                       className={cn('pl-3 text-left font-normal normal-case', !field.value && 'text-muted-foreground')}
                     >
-                      {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                      {field.value ? format(field.value, 'dd/MM/yyyy') : <span>Pick a date</span>}
                       <CalendarIcon className="ml-auto size-4 opacity-50" />
                     </Button>
                   </FormControl>
@@ -138,7 +148,12 @@ export default function LoginForm() {
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                    disabled={(date) => {
+                      const today = new Date()
+                      today.setHours(0, 0, 0, 0)
+                      // return date < today || date < new Date('1900-01-01') // disable dates before today and before 1900
+                      return date > today || date < new Date('1900-01-01') // disable dates after today and before 1900
+                    }}
                     initialFocus
                     weekStartsOn={1}
                   />
