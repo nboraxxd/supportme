@@ -137,7 +137,7 @@ export default function LoginForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
-              <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
+              <Popover open={openCalendar} onOpenChange={setOpenCalendar} modal={true}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
