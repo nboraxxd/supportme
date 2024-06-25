@@ -1,9 +1,10 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { format } from 'date-fns'
+import { useState } from 'react'
 import { CalendarIcon } from 'lucide-react'
+import { format } from 'date-fns'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 import { cn } from '@/lib/utils'
 import { SignUpFormValues, signUpFormSchema } from '@/lib/validation'
@@ -15,6 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
 export default function LoginForm() {
+  const [openCalendar, setOpenCalendar] = useState(false)
+
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
@@ -31,6 +34,9 @@ export default function LoginForm() {
   })
 
   const accountType = form.watch('account.type')
+
+  const dobFromDate = new Date()
+  dobFromDate.setFullYear(dobFromDate.getFullYear() - 120)
 
   function onSubmit(values: SignUpFormValues) {
     console.log(values)
@@ -131,7 +137,7 @@ export default function LoginForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
-              <Popover>
+              <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -147,15 +153,22 @@ export default function LoginForm() {
                   <Calendar
                     mode="single"
                     selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => {
-                      const today = new Date()
-                      today.setHours(0, 0, 0, 0)
-                      // return date < today || date < new Date('1900-01-01') // disable dates before today and before 1900
-                      return date > today || date < new Date('1900-01-01') // disable dates after today and before 1900
+                    onSelect={(ev) => {
+                      field.onChange(ev)
+                      setOpenCalendar(false)
                     }}
+                    // disabled={(date) => {
+                    //   const today = new Date()
+                    //   today.setHours(0, 0, 0, 0)
+                    //   return date < today || date < new Date('1900-01-01') // disable dates before today and before 1900
+                    //   return date > today || date < new Date('1900-01-01') // disable dates after today and before 1900
+                    // }}
                     initialFocus
+                    fixedWeeks
                     weekStartsOn={1}
+                    fromDate={dobFromDate}
+                    toDate={new Date()}
+                    captionLayout="dropdown-buttons"
                   />
                 </PopoverContent>
               </Popover>
