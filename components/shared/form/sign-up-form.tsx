@@ -163,6 +163,7 @@ export default function LoginForm() {
                     //   return date < today || date < new Date('1900-01-01') // disable dates before today and before 1900
                     //   return date > today || date < new Date('1900-01-01') // disable dates after today and before 1900
                     // }}
+                    today={field.value || new Date()}
                     initialFocus
                     fixedWeeks
                     weekStartsOn={1}
